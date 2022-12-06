@@ -3,6 +3,7 @@ package src;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.awt.event.ActionEvent;
@@ -49,8 +50,18 @@ public class User extends JFrame implements ActionListener, SysEntry, Observer, 
     JScrollPane newsFeedScroll;
     JTextArea alertTextArea;
 
+    // A3: add Date for creation
+    long creationTime;
+    long lastUpdateTime;
+
+    // A3: labels to display creationTime and lastUpdateTime
+    JLabel creationTimeLabel;
+    JLabel lastUpdateTimeLabel;
+
     public User(String username) {
         this.userName = username;
+        this.creationTime = System.currentTimeMillis();
+        this.lastUpdateTime = -1;
         this.ID = UUID.randomUUID();
     }
 
@@ -121,6 +132,12 @@ public class User extends JFrame implements ActionListener, SysEntry, Observer, 
         this.newsFeedScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         this.newsFeedScroll.setBounds(20, 440, 495, 200);
 
+        // A3: display creationTime and lastUpdateTime
+        this.creationTimeLabel = new JLabel("Creation Time: " + Long.toString(this.creationTime));
+        this.creationTimeLabel.setBounds(20, 650, 240, 40);
+        this.lastUpdateTimeLabel = new JLabel("Last Updated: " + Long.toString(this.lastUpdateTime));
+        this.lastUpdateTimeLabel.setBounds(20, 680, 240, 40);
+
         add(followUserLabel);
         add(followUserTextArea);
         add(followUserButton);
@@ -131,8 +148,10 @@ public class User extends JFrame implements ActionListener, SysEntry, Observer, 
         add(tweetButton);
         add(newsFeedLabel);
         add(newsFeedScroll);
+        add(creationTimeLabel);
+        add(lastUpdateTimeLabel);
 
-        setSize(550, 700);
+        setSize(550, 800);
         setTitle(this.userName);
         setLayout(null);
         setResizable(false);
@@ -194,6 +213,9 @@ public class User extends JFrame implements ActionListener, SysEntry, Observer, 
         this.allTweets.add(newTweet);
         this.newsFeedListModel.addElement(newTweet);
 
+        // A3: update lastUpdateTime when receive a tweet
+        this.lastUpdateTimeLabel.setText("Last Updated: " + Long.toString(System.currentTimeMillis()));
+
     }
 
     @Override
@@ -239,15 +261,22 @@ public class User extends JFrame implements ActionListener, SysEntry, Observer, 
 
     private void postTweetClicked() {
         Tweet newTweet = new Tweet(this.tweetTextArea.getText(), this.getName());
+
+        // A3: update last time updated
+        this.lastUpdateTime = System.currentTimeMillis();
+
         this.myTweets.add(newTweet);
         this.allTweets.add(newTweet);
 
         this.newsFeedListModel.addElement(newTweet);
+        this.lastUpdateTimeLabel.setText("Last Updated: " + Long.toString(System.currentTimeMillis()));
 
         // notify all observers
         this.Notify(newTweet);
 
     }
+
+    // private void getLast
 
     public String toString() {
         return this.userName;

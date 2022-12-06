@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.*;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -158,6 +160,16 @@ public class AdminPanel implements ActionListener {
         showPositivePercButton.setBounds(595, 475, 180, 50);
         showPositivePercButton.addActionListener(this);
 
+        // A3: button to check if user/group ID's are valid
+        JButton validIDs = new JButton("Check IDs");
+        validIDs.setBounds(390, 280, 180, 50);
+        validIDs.addActionListener(this);
+
+        // A3: button to get last updated User
+        JButton lastUpdatedUser = new JButton("Last Updated User");
+        lastUpdatedUser.setBounds(595, 280, 180, 50);
+        lastUpdatedUser.addActionListener(this);
+
         frame.add(this.treeScroll);
         frame.add(treeLabel);
         frame.add(addUserLabel);
@@ -167,6 +179,8 @@ public class AdminPanel implements ActionListener {
         frame.add(addGroupTextArea);
         frame.add(addGroupButton);
         frame.add(openUserViewButton);
+        frame.add(validIDs);
+        frame.add(lastUpdatedUser);
         frame.add(showUserTotalButton);
         frame.add(showGroupTotalButton);
         frame.add(showMessagesTotalButton);
@@ -375,6 +389,85 @@ public class AdminPanel implements ActionListener {
 
     }
 
+    // A3: Check if user/group IDs are valid
+    private boolean checkIDs() {
+
+        Set<String> set = new HashSet<>();
+
+        for (User user : this.userMap.values()) {
+            // validation:
+            // 1. all IDs must be unique
+            // 2. all IDs should not contain spaces
+            if (set.contains(user.getName()) || user.getName().contains(" ")) {
+                return false;
+            }
+
+            set.add(user.getName());
+
+        }
+
+        for (Group group : this.groupMap.values()) {
+            // validation:
+            // 1. all IDs must be unique
+            // 2. all IDs should not contain spaces
+
+            if (set.contains(group.getName()) || group.getName().contains(" ")) {
+                return false;
+            }
+
+            set.add(group.getName());
+
+        }
+
+        return true;
+
+    }
+
+    private void checkIDsClicked() {
+
+        boolean result = checkIDs();
+        StringBuilder newString = new StringBuilder();
+        newString.append("User/Group IDs are ");
+
+        if (result) {
+            newString.append("Valid!");
+        } else {
+            newString.append("Invalid!");
+        }
+
+        String resultStr = newString.toString();
+
+        JOptionPane.showMessageDialog(null, resultStr);
+
+    }
+
+    // A3: Get last updated user
+    private void getLastUpdatedUser() {
+
+        long minTime = Long.MAX_VALUE;
+        String lastUpdatedStr = "";
+
+        for (User user : userMap.values()) {
+
+            if (user.lastUpdateTime == -1) {
+                continue;
+            }
+
+            if (user.lastUpdateTime < minTime) {
+                minTime = user.lastUpdateTime;
+                lastUpdatedStr = user.getName();
+            }
+
+        }
+
+        if (minTime == Long.MAX_VALUE) {
+            JOptionPane.showMessageDialog(null, "None");
+        } else {
+            JOptionPane.showInputDialog(null, lastUpdatedStr);
+        }
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -390,6 +483,12 @@ public class AdminPanel implements ActionListener {
                 break;
             case "Open User View":
                 openUserViewClicked();
+                break;
+            case "Check IDs":
+                checkIDsClicked();
+                break;
+            case "Last Updated User":
+                getLastUpdatedUser();
                 break;
             case "Show User Total":
                 showUserTotalClicked();

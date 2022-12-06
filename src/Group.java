@@ -1,6 +1,7 @@
 package src;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,9 +14,13 @@ public class Group implements SysEntry {
 
     private List<SysEntry> listOfSysEntry;
 
+    // A3: add date of creation
+    long creationTime;
+
     public Group(String groupName) {
         this.groupName = groupName;
         this.listOfSysEntry = new ArrayList<SysEntry>();
+        this.creationTime = System.currentTimeMillis();
 
     }
 
